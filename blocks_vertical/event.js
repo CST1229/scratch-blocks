@@ -82,13 +82,13 @@ Blockly.Blocks['event_whenflagclicked'] = {
       "args0": [
         {
           "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "blue-flag.svg",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "green-flag.svg",
           "width": 24,
           "height": 24,
           "alt": "flag"
         }
       ],
-      "category": Blockly.Categories.event,
+      "category": sockly.Categories.event,
       "extensions": ["colours_event", "shape_hat"]
     });
   }
