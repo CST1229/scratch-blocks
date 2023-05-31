@@ -1,26 +1,4 @@
-# PenguinMod/scratch-blocks
-
-<!-- ## Playgrounds
-
- - **Vertical blocks**: https://turbowa arp.github.io/scratch-blocks/tests/vertical_playground_compressed.html -->
-
-## Local development
-
-Install dependencies:
-
-```
-npm ci
-```
-
-The playground to use for local testing is tests/vertical_playground.html.
-
-To build, run:
-
-```
-npm run prepublish
-```
-
-requires Python 2. scratch-gui development server must be restarted to update linked scratch-blocks.
+scratch-blocks modified for use in [TurboWarp](https://turbowarp.org/), modified for use in [PenguinMod](https://penguinmod.site/), modified for use in Codebase (quite recursive!).
 
 <!--
 #### Scratch Blocks is a library for building creative computing interfaces.
@@ -28,8 +6,6 @@ requires Python 2. scratch-gui development server must be restarted to update li
 [![Dependency Status](https://david-dm.org/LLK/scratch-blocks.svg)](https://david-dm.org/LLK/scratch-blocks)
 [![devDependency Status](https://david-dm.org/LLK/scratch-blocks/dev-status.svg)](https://david-dm.org/LLK/scratch-blocks#info=devDependencies)
 -->
-
-![](https://cloud.githubusercontent.com/assets/747641/15227351/c37c09da-1854-11e6-8dc7-9a298f2b1f01.jpg)
 
 <!--
 ## Introduction
