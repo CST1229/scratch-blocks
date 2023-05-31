@@ -88,7 +88,7 @@ Blockly.Blocks['event_whenflagclicked'] = {
           "alt": "flag"
         }
       ],
-      "category": sockly.Categories.event,
+      "category": Blockly.Categories.event,
       "extensions": ["colours_event", "shape_hat"]
     });
   }
