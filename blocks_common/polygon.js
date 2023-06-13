@@ -19,9 +19,9 @@ const getXYForPoint = (point, points, opt_offset, opt_scale) => {
   const origin = 360 / points;
   
   const dir = Blockly.utils.toRadians(((origin * point) - (origin / 2)) - 90);
-  const x = Math.cos(dir) * scale;
-  const y = Math.sin(dir) * scale;
-  return [x + offset[0],y + offset[1]];
+  const x = Math.round(Math.cos(dir) * scale);
+  const y = Math.round(Math.sin(dir) * scale);
+  return [x + offset[0], y + offset[1]];
 }
 
 Blockly.Blocks['polygon'] = {
@@ -31,7 +31,7 @@ Blockly.Blocks['polygon'] = {
    */
   init: function() {
     this.color = Blockly.Colours.pen.primary
-    this.expanded = true
+    this.expanded = true;
     this.points = 0
     this.offset = [0,0]
     this.scale = 50
@@ -50,38 +50,32 @@ Blockly.Blocks['polygon'] = {
     return container;
   },
   domToMutation: function(xmlElement) {
-    console.log('loading block settings...')
     const newPoints = JSON.parse(xmlElement.getAttribute('points'))
     const newColor = xmlElement.getAttribute('color') || ''
     const newOffset = JSON.parse(xmlElement.getAttribute('midle') || '""')
     const newScale = JSON.parse(xmlElement.getAttribute('scale') || '""')
-    const newExpanded = JSON.parse(xmlElement.getAttribute('expanded') || 'false')
+    // const newExpanded = JSON.parse(xmlElement.getAttribute('expanded') || 'false')
+    const newExpanded = true;
     if (newPoints !== this.points) {
-      console.log('new points')
       this.clear()
       this.points = newPoints
       this.generate()
     }
     if (typeof newColor === 'string') {
-      console.log('setting color')
       this.color = newColor
     }
     if (newOffset && Array.isArray(newOffset)) {
-      console.log('setting center position')
       this.offset = newOffset
     }
     if (typeof newScale === 'number') {
-      console.log('setting scale')
       this.length = newScale
     }
     if (typeof newExpanded === 'boolean' && newExpanded !== this.expanded) {
-      this.setExpanded(newExpanded)
-      this.setFieldValue(newExpanded, 'button')
+      this.setExpanded(true)
     }
   },
   clear: function() {
     const connections = {}
-    console.log('clearing block...')
     for (let point = 1; point <= this.points; point++) {
       const xName = `x${point}`
       const yName = `y${point}`
@@ -98,8 +92,6 @@ Blockly.Blocks['polygon'] = {
   },
   generate: function() {
     const connections = this.oldConnections
-    // create all the node inputs
-    console.log(`creating ${this.points} points...`)
     for (let point = 1; point <= this.points; point++) {
       const xName = `x${point}`
       const yName = `y${point}`
@@ -125,12 +117,10 @@ Blockly.Blocks['polygon'] = {
         newyBlock.setFieldValue(String(initialValue[1]), 'NUM');
         newxBlock.setShadow(true);
         newyBlock.setShadow(true);
-        if (this.expanded){
-          newxBlock.initSvg();
-          newyBlock.initSvg();
-          newxBlock.render(false);
-          newyBlock.render(false);
-        }
+        newxBlock.initSvg();
+        newyBlock.initSvg();
+        newxBlock.render(false);
+        newyBlock.render(false);
         newxBlock.outputConnection.connect(xConnection)
         newyBlock.outputConnection.connect(yConnection)
         this.myBlocks[xName] = newxBlock
@@ -152,23 +142,15 @@ Blockly.Blocks['polygon'] = {
       yInput.appendField('y: ')
     }
 
-    console.log('initializing block...')
     this.setColour(this.color, this.color, this.color)
     this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE)
     this.setOutput(true, 'math_polygon')
     this.setShadow(true);
 
-    console.log('creating colapse/expand button...')
-    const thisBlock = this;
-    const button = new Blockly.FieldCheckbox(
-      this.expanded, 
-      newState => {
-        thisBlock.setExpanded(newState)
-        return newState
-      }
-    )
-    this.appendDummyInput('buttonContainer')
-      .appendField(button, 'button')
+    this.initSvg();
+    this.rerenderChildBlocks();
+
+    this.setExpanded(true);
   },
   setExpanded: function(bool) {
     this.expanded = bool
@@ -177,8 +159,8 @@ Blockly.Blocks['polygon'] = {
       const yName = `y${point}`
       const xInput = this.getInput(xName)
       const yInput = this.getInput(yName)
-      xInput.setVisible(bool)
-      yInput.setVisible(bool)
+      xInput.setVisible(true)
+      yInput.setVisible(true)
     }
     this.initSvg();
     // we dont need to re-render this block since renderChildren will render all parents aswell
