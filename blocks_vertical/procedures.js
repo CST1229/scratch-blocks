@@ -67,6 +67,11 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function(xmlElement) 
   this.edited = JSON.parse(xmlElement.getAttribute('edited'));
   this.outputType = JSON.parse(xmlElement.getAttribute('optype'));
   this.color = JSON.parse(xmlElement.getAttribute('color'));
+  // compat bc dum poopoo code
+  if (!this.color) this.color = [Blockly.Colours.more.primary, Blockly.Colours.more.secondary, Blockly.Colours.more.tertiary]
+  if (this.color && this.color.primary) {
+    this.color = [this.color.primary, this.color.secondary, this.color.tertiary]
+  }
   this.image = xmlElement.innerText;
   this.updateDisplay_();
 };
@@ -117,11 +122,16 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function(xmlEleme
   this.argumentDefaults_ = JSON.parse(xmlElement.getAttribute('argumentdefaults'));
   this.output_ = JSON.parse(xmlElement.getAttribute('returns'));
   this.outputType = JSON.parse(xmlElement.getAttribute('optype'));
-  this.updateDisplay_();
   this.edited = JSON.parse(xmlElement.getAttribute('edited'));
   this.image = xmlElement.innerText;
   this.color = JSON.parse(xmlElement.getAttribute('color'));
+  // compat bc dum poopoo code
+  if (!this.color) this.color = [Blockly.Colours.more.primary, Blockly.Colours.more.secondary, Blockly.Colours.more.tertiary]
+  if (this.color && this.color.primary) {
+    this.color = [this.color.primary, this.color.secondary, this.color.tertiary]
+  }
   this.image = xmlElement.innerText;
+  this.updateDisplay_();
   if (this.updateArgumentReporterNames_) {
     this.updateArgumentReporterNames_(prevArgIds, prevDisplayNames);
   }
@@ -159,7 +169,20 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
   this.createAllInputs_(connectionMap);
   this.deleteShadows_(connectionMap);
   this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE);
-  if (this.color) this.setColour(this.color.primary, this.color.secondary, this.color.tertiary)
+  // only change the color if we have a color to change to
+  this.setColour(...this.color)
+  if (
+      this.outputConnection && 
+      this.outputConnection.targetConnection && 
+      this.outputConnection.targetConnection.sourceBlock_.type === 'procedures_definition_return') {
+    this.outputConnection.targetConnection.sourceBlock_.setColour(...this.color)
+  }
+  if (
+      this.previousConnection && 
+      this.previousConnection.targetConnection && 
+      this.previousConnection.targetConnection.sourceBlock_.type === 'procedures_definition') {
+    this.previousConnection.targetConnection.sourceBlock_.setColour(...this.color)
+  }
   if (this.output_) {
     this.setPreviousStatement(false)
     this.setNextStatement(false)
@@ -434,6 +457,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
     var newBlock = this.workspace.newBlock(blockType);
     newBlock.setShadow(true);
     newBlock.setFieldValue(displayName, 'VALUE');
+    newBlock.color = this.color
+    newBlock.setColour(...this.color)
     if (!this.isInsertionMarker()) {
       newBlock.initSvg();
       newBlock.render(false);
@@ -755,16 +780,12 @@ Blockly.ScratchBlocks.ProcedureUtils.unsetImage = function() {
 }
 
 Blockly.ScratchBlocks.ProcedureUtils.setColor = function(primary, secondary, tertiary) {
-  this.color = {
-    primary,
-    secondary,
-    tertiary
-  }
+  this.color = [primary, secondary, tertiary]
   this.updateDisplay_();
 }
 
 Blockly.ScratchBlocks.ProcedureUtils.removeColor = function() {
-  this.color = Blockly.Colours.more
+  this.color = [Blockly.Colours.more.primary, Blockly.Colours.more.secondary, Blockly.Colours.more.tertiary]
   this.updateDisplay_();
 }
 
@@ -878,6 +899,25 @@ Blockly.ScratchBlocks.ProcedureUtils.updateArgumentReporterNames_ = function(pre
   }
 };
 
+Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom = function() {
+  var dom = document.createElement('mutation');
+  dom.setAttribute('color', JSON.stringify(this.color))
+  return dom
+};
+
+Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation = function(dom) {
+  try {
+    this.color = JSON.parse(dom.getAttribute('color'))
+    this.updateDisplay_()
+  } catch (err) {
+    console.log('unkown old argument reporter')
+  }
+};
+
+Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay = function(dom) {
+  this.setColour(...this.color)
+};
+
 Blockly.Blocks['procedures_definition'] = {
   /**
    * Block for defining a procedure with no return value.
@@ -935,7 +975,7 @@ Blockly.Blocks['procedures_call'] = {
     this.edited = false
     this.outputType = 'statement'
     this.image = ''
-    this.color = Blockly.Colours.more
+    this.color = [Blockly.Colours.more.primary, Blockly.Colours.more.secondary, Blockly.Colours.more.tertiary]
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -979,7 +1019,7 @@ Blockly.Blocks['procedures_prototype'] = {
     this.edited = false
     this.outputType = 'statement'
     this.image = ''
-    this.color = Blockly.Colours.more
+    this.color = [Blockly.Colours.more.primary, Blockly.Colours.more.secondary, Blockly.Colours.more.tertiary]
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -1021,7 +1061,7 @@ Blockly.Blocks['procedures_declaration'] = {
     this.edited = false
     this.outputType = 'statement'
     this.image = ''
-    this.color = Blockly.Colours.more
+    this.color = [Blockly.Colours.more.primary, Blockly.Colours.more.secondary, Blockly.Colours.more.tertiary]
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -1074,7 +1114,10 @@ Blockly.Blocks['argument_reporter_boolean'] = {
       ],
       "extensions": ["colours_more", "output_boolean"]
     });
-  }
+  },
+  updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay,
+  mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
+  domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
 };
 
 Blockly.Blocks['argument_reporter_string_number'] = {
@@ -1090,7 +1133,10 @@ Blockly.Blocks['argument_reporter_string_number'] = {
       ],
       "extensions": ["colours_more", "output_number", "output_string"]
     });
-  }
+  },
+  updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay,
+  mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
+  domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
 };
 
 Blockly.Blocks['argument_editor_boolean'] = {

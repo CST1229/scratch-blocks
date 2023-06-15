@@ -490,7 +490,7 @@ Blockly.jsonInitFactory_ = function(jsonDef) {
  * by the Blockly Developer Tools.
  * @param {!Array.<!Object>} jsonArray An array of JSON block definitions.
  */
-Blockly.defineBlocksWithJsonArray = function(jsonArray) {
+Blockly.defineBlocksWithJsonArray = function(jsonArray, ignoreOverwrites) {
   for (var i = 0; i < jsonArray.length; i++) {
     var elem = jsonArray[i];
     if (!elem) {
@@ -504,6 +504,13 @@ Blockly.defineBlocksWithJsonArray = function(jsonArray) {
             'Block definition #' + i +
             ' in JSON array is missing a type attribute. Skipping.');
       } else {
+        if (Blockly.Blocks[typename]) {
+          if (!ignoreOverwrites) {
+            console.warn(
+                'Block definition #' + i + ' in JSON array' +
+                ' overwrites prior definition of "' + typename + '".');
+          }
+        }
         Blockly.Blocks[typename] = {
           init: Blockly.jsonInitFactory_(elem)
         };
