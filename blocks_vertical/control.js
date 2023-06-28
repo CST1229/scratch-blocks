@@ -27,30 +27,6 @@ goog.require('Blockly.Colours');
 goog.require('Blockly.ScratchBlocks.VerticalExtensions');
 
 
-Blockly.Blocks['your_mom'] = {
-  init: function() {
-    this.jsonInit({
-      "message0": "your mom %1",
-      "args0": [
-        {
-          "type": "field_image",
-          "src": "https://cdn.discordapp.com/emojis/1039714598959452261.webp?size=128&quality=lossless",
-          "width": 15,
-          "height": 15,
-          "alt": "*",
-          "flipRtl": false
-        }
-      ],
-      "inputsInline": true,
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": "#ff0000",
-      "tooltip": "your mom :trel:",
-      "helpUrl": "https://tenor.com/view/urmom-your-mom-baldi-defaultdance-gif-19665250"
-    })
-  }
-}
-
 Blockly.Blocks['control_forever'] = {
   /**
    * Block for repeat n times (external number).
@@ -637,6 +613,30 @@ Blockly.Blocks['control_run_as_sprite'] = {
   }
 };
 
+Blockly.Blocks['control_inline_stack_output'] = {
+  /**
+   * pm: Block to run a stack and output a return from it.
+   * @this Blockly.Block
+   */
+  init: function () {
+    this.jsonInit({
+      "message0": 'inline block',
+      "message1": "%1",
+      "args1": [
+        {
+          "type": "input_statement",
+          "check": 'normal',
+          "name": "SUBSTACK"
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "output": "String",
+      "outputShape": Blockly.OUTPUT_SHAPE_SQUARE,
+      "extensions": ["colours_control"]
+    });
+  }
+};
+
 Blockly.Blocks['control_get_counter'] = {
   /**
    * pm: Block to get the counter value.
@@ -731,6 +731,24 @@ Blockly.Blocks['control_all_at_once'] = {
   init: function() {
     this.jsonInit({
       "message0": Blockly.Msg.CONTROL_ALLATONCE,
+      "message1": "%1", // Statement
+      "args1": [
+        {
+          "type": "input_statement",
+          "check": 'normal',
+          "name": "SUBSTACK"
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "extensions": ["colours_control", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['control_new_script'] = {
+  init: function () {
+    this.jsonInit({
+      "message0": "new script",
       "message1": "%1", // Statement
       "args1": [
         {
